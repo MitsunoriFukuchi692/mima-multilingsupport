@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-<!--テスト確認用　250608-->
+# テスト確認用　250608
 print("API KEY from env:", os.getenv("OPENAI_API_KEY"))
 
 app = Flask(__name__)
@@ -13,7 +13,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return "Hello from Mima!"
 
 @app.route('/chat', methods=['POST'])
 def chat():
