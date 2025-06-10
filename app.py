@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, jsonify, send_file
 from openai import OpenAI
 import os
+import json
 from dotenv import load_dotenv
-from google.cloud import texttospeech
 from io import BytesIO
+from google.cloud import texttospeech
+from google.oauth2 import service_account
 
 load_dotenv()
 
@@ -58,20 +60,29 @@ def tts():
 
     voice_lang = lang_map.get(lang, "ja-JP")
 
-    tts_client = texttospeech.TextToSpeechClient()
-    synthesis_input = texttospeech.SynthesisInput(text=text)
-    voice = texttospeech.VoiceSelectionParams(
-        language_code=voice_lang,
-        ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
-    )
-    audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
+    try:
+        # GOOGLE_CREDENTIALS_JSON を読み込んで認証情報を作成
+        credentials_info = json.loads(os.getenv("GOOGLE_CREDENTIALS_JSON"))
+        credentials = service_account.Credentials.from_service_account_info(credentials_info)
 
-    response = tts_client.synthesize_speech(
-        input=synthesis_input, voice=voice, audio_config=audio_config
-    )
+        tts_client = texttospeech.TextToSpeechClient(credentials=credentials)
 
-    audio_data = BytesIO(response.audio_content)
-    return send_file(audio_data, mimetype="audio/mp3")
+        synthesis_input = texttospeech.SynthesisInput(text=text)
+        voice = texttospeech.VoiceSelectionParams(
+            language_code=voice_lang,
+            ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
+        )
+        audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
+
+        response = tts_client.synthesize_speech(
+            input=synthesis_input, voice=voice, audio_config=audio_config
+        )
+
+        audio_data = BytesIO(response.audio_content)
+        return send_file(audio_data, mimetype="audio/mp3")
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
