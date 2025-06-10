@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>多言語介護サポートボット</title>
+  <title>AIみまくん - 多言語介護サポートボット</title>
 </head>
 <body>
   <h1>AIみまくん - 多言語介護サポートボット</h1>
@@ -17,14 +17,15 @@
     <option value="ms">Malay</option>
   </select>
 
-  <!-- ユーザー入力 -->
+  <!-- 入力と送信 -->
   <div>
     <input type="text" id="messageInput" placeholder="メッセージを入力してください">
     <button onclick="sendMessage()">送信</button>
+    <button onclick="startVoiceInput()">🎤 マイク</button>
   </div>
 
   <!-- 応答表示 -->
-  <div id="chatArea"></div>
+  <div id="chatArea" style="margin-top: 20px;"></div>
 
   <script>
     async function sendMessage() {
@@ -39,8 +40,37 @@
 
       const data = await response.json();
       const chatArea = document.getElementById("chatArea");
+
       chatArea.innerHTML += `<p><strong>あなた:</strong> ${message}</p>`;
       chatArea.innerHTML += `<p><strong>AI:</strong> ${data.reply}</p>`;
+
+      // 今後ここでTTSも再生可能（次ステップ）
+    }
+
+    function startVoiceInput() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      const langCode = document.getElementById("lang").value;
+
+      const langMap = {
+        "ja": "ja-JP",
+        "en": "en-US",
+        "tl": "tl-PH",
+        "id": "id-ID",
+        "ms": "ms-MY"
+      };
+
+      recognition.lang = langMap[langCode] || "ja-JP";
+
+      recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById("messageInput").value = transcript;
+      };
+
+      recognition.onerror = function (event) {
+        alert("音声認識エラー: " + event.error);
+      };
+
+      recognition.start();
     }
   </script>
 </body>
