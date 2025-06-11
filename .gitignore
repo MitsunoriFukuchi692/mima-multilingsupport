@@ -1,1 +1,25 @@
+<<<<<<< HEAD
 .env 
+=======
+# 環境ファイル（APIキーなど）
+.env
+
+# Pythonバイトコード
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 仮想環境（venv など）
+venv/
+env/
+
+# OSファイル
+.DS_Store
+Thumbs.db
+
+# IDE / エディタ関連
+.vscode/
+.idea/
+
+# Pip freezeや依存用に requirements.txt はコミットする（除外しない）
+>>>>>>> e1809fc1d060523fed611d195b63d5a32014fd0e

@@ -1,3 +1,8 @@
 flask
 openai
 python-dotenv
+<<<<<<< HEAD
+=======
+gunicorn
+google-cloud-texttospeech
+>>>>>>> e1809fc1d060523fed611d195b63d5a32014fd0e
